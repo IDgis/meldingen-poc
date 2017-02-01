@@ -26,3 +26,4 @@ twbs:bootstrap
 iron:router
 aldeed:simple-schema
 aldeed:collection2
+appcache
