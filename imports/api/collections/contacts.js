@@ -35,7 +35,5 @@ Contacts.allow({
 		return true;
 	}
 });
- 
-if (Meteor.isCordova) {
-  Ground.Collection(Contacts);
-}
+
+Ground.Collection(Contacts);
