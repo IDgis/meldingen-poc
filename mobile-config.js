@@ -19,15 +19,11 @@ App.info({
 // });
 // Set PhoneGap/Cordova preferences
 App.setPreference('BackgroundColor', '0xff0000ff');
-App.setPreference('HideKeyboardFormAccessoryBar', true);
-App.setPreference('Orientation', 'default');
-App.setPreference('Orientation', 'all', 'ios');
-App.setPreference('android-targetSdkVersion', '22');
 // Add custom tags for a particular PhoneGap/Cordova plugin
 // to the end of generated config.xml.
 // Universal Links is shown as an example here.
 App.appendToConfig(`
   <universal-links>
-    <host name="ijssel:3000/offline-contacts" />
+    <host name="http://192.168.1.29:3000/offline-contacts" />
   </universal-links>
 `);

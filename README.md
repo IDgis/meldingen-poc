@@ -5,11 +5,12 @@
 ### Building
 
 - First, make sure that
-  * the mobile-config.js file is in the root folder;
+  * the `mobile-config.js` file is in the root folder;
   * the android platform has been added by running `meteor add-platform android`;
   * you have installed the Android SDK;
-  * you have set ANDROID_HOME;
+  * you have set `ANDROID_HOME`;
   * you have a Java KeyStore (and a password) to sign your app with.
+- Change the host name in `mobile-config.js` to your host name.
 - Build APK by running `meteor build ..\output --server=http://<your-host>:3000/offline-contacts`. The APK will be generated as `..\output\android\release-unsigned.apk`.
 - The tool needed for aligning and signed can be found in `%ANDROID_HOME%\build-tools\<your-version>`. Add this location to your PATH;
 - Move to the folder `output\android`.
