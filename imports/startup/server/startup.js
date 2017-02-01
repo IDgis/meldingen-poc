@@ -1,7 +1,7 @@
-import { Contacts } from '/imports/api/collections/contacts.js';
+import { Message } from '/imports/api/collections/message.js';
 
-Meteor.startup(function () {
-	Meteor.publish('contacts', function() {
-		return Contacts.find();
+Meteor.startup(function() {
+	Meteor.publish('message', function() {
+		return Message.find();
 	});
 });
