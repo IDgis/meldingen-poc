@@ -6,13 +6,13 @@ import { Message, MessageSchema } from '/imports/api/collections/message.js';
 Template.message.onRendered(function() {
 	var projection = new ol.proj.Projection({
 		code: 'EPSG:28992',
-		extent: [185130.30300000, 331786.35260000, 186691.93210000, 333634.55600000]
+		extent: [170000, 300000, 213000, 412000]
 	});
 
 	var view = new ol.View({
 		projection: projection,
-		center: [185911, 332710],
-		zoom: 1
+		center: [191500, 356000],
+		zoom: 2
 	});
 
 	var zoomControl = new ol.control.Zoom();
@@ -45,9 +45,16 @@ Template.message.onRendered(function() {
 		}),
 		visible: true
 	});
+	
+	var afdelingen = new ol.layer.Vector({
+		source: new ol.source.Vector({
+			url: 'geojson/test.geojson',
+			format: new ol.format.GeoJSON()
+		})
+	});
 
 	map = new ol.Map({
-		layers: [achtergrond],
+		layers: [achtergrond, afdelingen],
 		control: zoomControl,
 		target: 'map',
 		view: view
@@ -55,7 +62,7 @@ Template.message.onRendered(function() {
 });
 
 Template.message.helpers({
-	'contacts': function() {
-		return Contacts.find({});
+	'message': function() {
+		return Message.find();
 	}
 });
