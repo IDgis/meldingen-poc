@@ -24,26 +24,38 @@ Template.message.onRendered(function() {
 		var indexResolution = resolutions.indexOf(resolution);
 		return 'EPSG:28992' + ':' + indexResolution;
 	});
-
+	
+	var tileExtent = [-285401.920000, 22598.080000, 595401.920000, 903401.920000];
+	var tileOrigin = [-285401.920000, 22598.080000]
+	
 	var tileGrid0 = new ol.tilegrid.WMTS({
-		origin: [-285401.920, 903401.920],
+		origin: tileOrigin,
 		resolutions: resolutions,
 		matrixIds: matrixIds0
 	});
 
 	var achtergrond = new ol.layer.Tile({
-		opacity: 0.8,
-		extent: [-285401.92, 22598.08, 595401.9199999999, 903401.9199999999],
-		source : new ol.source.WMTS({
-			attributions: [],
-			url: '//geodata.nationaalgeoregister.nl/wmts',
-			layer: 'brtachtergrondkaartgrijs',
-			matrixSet: 'EPSG:28992',
-			format: 'image/png',
+		preload: 1,
+		source: new ol.source.TileImage({
+			crossOrigin: null,
+			extent: tileExtent,
+			projection: new ol.proj.Projection({
+				code: 'EPSG:28992',
+				extent: tileExtent
+			}),
 			tileGrid: tileGrid0,
-			style: 'default'
-		}),
-		visible: true
+			tileUrlFunction: function(coordinate) {
+				if(coordinate === null) {
+					return undefined;
+				}
+
+                var z = coordinate[0];
+                var x = coordinate[1];
+                var y = coordinate[2];
+                var url = 'maps/' + z + '/' + x + '/' + y + '.png';
+                return url;
+            }
+        })
 	});
 	
 	var afdelingen = new ol.layer.Vector({
