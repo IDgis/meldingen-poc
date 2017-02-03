@@ -9,10 +9,6 @@ Router.configure({
 });
 
 Router.route('/', function () {
-	Router.go('contacts');
-});
-
-Router.route('/offline-contacts', function () {
 	this.render('message');
 	}, {
 		name: 'message'

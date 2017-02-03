@@ -2,21 +2,45 @@ import { Mongo } from 'meteor/mongo';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
 export const MessageSchema = new SimpleSchema({
-  name: {
+  coordinates: {
+    type: [String]
+  },
+  type: {
     type: String,
-    min: 3,
-    max: 20
+    label: 'Type',
+    allowedValues: ["waarneming", "controle_nodig"],
+    
+    autoform: {
+    	options: [
+    		{label: 'waarneming', value: 'waarneming'},
+    		{label: 'controle nodig', value: 'controle_nodig'}
+    	]
+    }
   },
-  email: {
-    type: String
-  },
-  createdAt: {
+  date: {
     type: Date,
-    optional: true
+    label: 'Datum'
   },
-  lastUpdated: {
-    type: Date,
-    optional: true
+  description: {
+    type: String,
+    label: 'Beschrijving',
+    
+    autoform: {
+    	rows: 4
+    }
+  },
+  status: {
+    type: String,
+    label: 'Status',
+    allowedValues: ['controle', 'afgehandeld', 'ter_goedkeuring'],
+    
+    autoform: {
+    	options: [
+    		{label: 'controle', value: 'controle'},
+    		{label: 'afgehandeld', value: 'afgehandeld'},
+    		{label: 'ter goedkeuring', value: 'ter_goedkeuring'}
+    	]
+    }
   }
 });
 
@@ -29,6 +53,4 @@ Message.allow({
 	remove: function() {return true;}
 });
  
-if (Meteor.isCordova) {
-  Ground.Collection(Contacts);
-}
+Ground.Collection(Message);

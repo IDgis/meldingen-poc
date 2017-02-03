@@ -59,10 +59,43 @@ Template.message.onRendered(function() {
 		target: 'map',
 		view: view
 	});
+	
+	map.on('singleclick', function(e) {
+		$('#message-input-modal').modal();
+		
+		$('#js-form-message-coordinates').attr('value', e.coordinate[0] + ',' + e.coordinate[1]);
+	});
 });
 
 Template.message.helpers({
-	'message': function() {
-		return Message.find();
+	messageDoc: function() {
+		return null;
+	},
+	message: function() {
+		return Message;
+	},
+	messageSchema: function() {
+		return MessageSchema;
+	},
+	messageLayers: function() {
+		var messages = Message.find().fetch();
+	}
+});
+
+AutoForm.addHooks('messageform', {
+	postsForm: {
+		docToForm: function(doc) {
+			if(_.isArray(doc.coordinates)) {
+				doc.coordinates = doc.coordinates.join(", ");
+			}
+			return doc;
+		},
+		formToDoc: function(doc) {
+			if(typeof doc.coordinates === "string") {
+				doc.coordinates = doc.coordinates.split(",");
+			}
+			
+			return doc;
+		}
 	}
 });
