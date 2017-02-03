@@ -19,8 +19,7 @@ Template.message.onRendered(function() {
 
 	var resolutions = 
 		[3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36, 1.68, 0.84, 0.42, 0.21];
-	var matrixIds0 = [];
-	matrixIds0 = $.map(resolutions, function(resolution) {
+	var matrixIds0 = $.map(resolutions, function(resolution) {
 		var indexResolution = resolutions.indexOf(resolution);
 		return 'EPSG:28992' + ':' + indexResolution;
 	});
@@ -65,7 +64,7 @@ Template.message.onRendered(function() {
 		})
 	});
 
-	map = new ol.Map({
+	var map = new ol.Map({
 		layers: [achtergrond, afdelingen],
 		control: zoomControl,
 		target: 'map',
@@ -77,6 +76,38 @@ Template.message.onRendered(function() {
 		
 		$('#js-form-message-coordinates').attr('value', e.coordinate[0] + ',' + e.coordinate[1]);
 	});
+	
+	var iconStyle = new ol.style.Style({
+		image: new ol.style.Icon(({
+			anchor: [0.5, 32],
+			anchorXUnits: 'fraction',
+			anchorYUnits: 'pixels',
+			opacity: 0.75,
+			src: 'images/location.svg',
+			size: [32, 32]
+		}))
+	});
+	
+	var messages = Message.find().fetch();
+	for(var i = 0; i < messages.length; i++) {
+		var coordinates = messages[i].coordinates;
+		
+		var coordinateX = parseInt(coordinates[0], 10);
+		var coordinateY = parseInt(coordinates[1], 10);
+		
+		var iconFeature = new ol.Feature({
+			geometry: new ol.geom.Point(coordinates)
+		});
+		
+		var vectorLayer = new ol.layer.Vector({
+			source: new ol.source.Vector({
+				features: [iconFeature]
+			})
+		});
+		
+		iconFeature.setStyle(iconStyle);
+		map.addLayer(vectorLayer);
+	}
 });
 
 Template.message.helpers({
@@ -90,7 +121,13 @@ Template.message.helpers({
 		return MessageSchema;
 	},
 	messageLayers: function() {
-		var messages = Message.find().fetch();
+		Message.find().fetch();
+	}
+});
+
+Template.message.events({
+	'click #js-message-submit': function() {
+		$('#message-input-modal').modal('hide');
 	}
 });
 
