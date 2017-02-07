@@ -2,7 +2,7 @@
 // the entire section is optional.
 App.info({
   id: 'nl.idgis.offlinecontacts',
-  name: 'Offline Contacts',
+  name: 'Offline Meldingen',
   description: 'Keep track off your contacts, even offline.',
   author: 'IDgis',
   email: 'mart.nijzink@idgis.nl',

@@ -16,7 +16,7 @@ Template.message.onRendered(function() {
 	});
 
 	var zoomControl = new ol.control.Zoom();
-
+	
 	var resolutions = 
 		[3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36, 1.68, 0.84, 0.42, 0.21];
 	var matrixIds0 = $.map(resolutions, function(resolution) {
@@ -67,6 +67,7 @@ Template.message.onRendered(function() {
 	var map = new ol.Map({
 		layers: [achtergrond, afdelingen],
 		control: zoomControl,
+		interactions: ol.interaction.defaults({doubleClickZoom :false}),
 		target: 'map',
 		view: view
 	});
@@ -75,6 +76,38 @@ Template.message.onRendered(function() {
 		$('#message-input-modal').modal();
 		
 		$('#js-form-message-coordinates').attr('value', e.coordinate[0] + ',' + e.coordinate[1]);
+	});
+	
+	map.on('dblclick', function(e) {
+		var features = afdelingen.getSource().getFeaturesAtCoordinate(e.coordinate);
+		
+		var elements = [$('#js-afdelingen-zero-found'), $('#js-afdelingen-afdeling'),
+			$('#js-afdelingen-afdelingsopp'), $('#js-afdelingen-beheerregio'),
+			$('#js-afdelingen-beheertype'), $('#js-afdelingen-beheertypecode'),
+			$('#js-afdelingen-functie')];
+		
+		for(var i = 0; i < features.length;) {
+			var props = features[i].getProperties();
+			
+			cleanElements(elements);
+			
+			$('#js-afdelingen-afdeling').append('<b>Afdeling</b>: ' + props.afdeling);
+			$('#js-afdelingen-afdelingsopp').append('<b>Afdelingsoppervlakte</b>: ' + props.afdelingsopp);
+			$('#js-afdelingen-beheerregio').append('<b>Beheerregio</b>: ' + props.beheerregio);
+			$('#js-afdelingen-beheertype').append('<b>Beheertype</b>: ' + props.beheertype);
+			$('#js-afdelingen-beheertypecode').append('<b>Beheertypecode</b>: ' + props.beheertypecode);
+			$('#js-afdelingen-functie').append('<b>Functie</b>: ' + props.functie);
+			
+			break;
+		}
+		
+		if(features.length === 0) {
+			cleanElements(elements);
+			
+			$('#js-afdelingen-zero-found').append('Niets gevonden.');
+		}
+		
+		$('#afdelingen-info-modal').modal();
 	});
 	
 	var iconStyle = new ol.style.Style({
@@ -124,6 +157,12 @@ Template.message.helpers({
 		Message.find().fetch();
 	}
 });
+
+function cleanElements(array) {
+	array.forEach(function(item) {
+		item.empty();
+	});
+}
 
 Template.message.events({
 	'click #js-message-submit': function() {
