@@ -1,3 +1,3 @@
-Meteor.startup(function () {
-	Meteor.subscribe('contacts');
+Meteor.startup(function() {
+	Meteor.subscribe('message');
 });

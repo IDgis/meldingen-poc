@@ -24,6 +24,6 @@ App.setPreference('BackgroundColor', '0xff0000ff');
 // Universal Links is shown as an example here.
 App.appendToConfig(`
   <universal-links>
-    <host name="http://192.168.1.29:3000/offline-contacts" />
+    <host name="http://lolee:3000" />
   </universal-links>
 `);
