@@ -2,6 +2,19 @@ import './message.html';
 import './message.css';
 
 import { Message, MessageSchema } from '/imports/api/collections/message.js';
+
+var map;
+
+var iconStyle = new ol.style.Style({
+		image: new ol.style.Icon(({
+		anchor: [0.5, 32],
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'pixels',
+		opacity: 0.75,
+		src: 'images/location.svg',
+		size: [32, 32]
+	}))
+});
  
 Template.message.onRendered(function() {
 	var projection = new ol.proj.Projection({
@@ -64,7 +77,7 @@ Template.message.onRendered(function() {
 		})
 	});
 
-	var map = new ol.Map({
+	map = new ol.Map({
 		layers: [achtergrond, afdelingen],
 		control: zoomControl,
 		interactions: ol.interaction.defaults({doubleClickZoom :false}),
@@ -110,38 +123,30 @@ Template.message.onRendered(function() {
 		$('#afdelingen-info-modal').modal();
 	});
 	
-	var iconStyle = new ol.style.Style({
-		image: new ol.style.Icon(({
-			anchor: [0.5, 32],
-			anchorXUnits: 'fraction',
-			anchorYUnits: 'pixels',
-			opacity: 0.75,
-			src: 'images/location.svg',
-			size: [32, 32]
-		}))
-	});
-	
 	var messages = Message.find().fetch();
 	for(var i = 0; i < messages.length; i++) {
 		var coordinates = messages[i].coordinates;
-		
-		var coordinateX = parseInt(coordinates[0], 10);
-		var coordinateY = parseInt(coordinates[1], 10);
-		
-		var iconFeature = new ol.Feature({
+		addIconLayer(coordinates, iconStyle);
+	}
+});
+
+function addIconLayer(coordinates, iconStyle) {
+	var coordinateX = parseInt(coordinates[0], 10);
+	var coordinateY = parseInt(coordinates[1], 10);
+
+	var iconFeature = new ol.Feature({
 			geometry: new ol.geom.Point(coordinates)
 		});
-		
-		var vectorLayer = new ol.layer.Vector({
+
+	var vectorLayer = new ol.layer.Vector({
 			source: new ol.source.Vector({
 				features: [iconFeature]
 			})
 		});
-		
-		iconFeature.setStyle(iconStyle);
-		map.addLayer(vectorLayer);
-	}
-});
+
+	iconFeature.setStyle(iconStyle);
+	map.addLayer(vectorLayer);
+};
 
 Template.message.helpers({
 	messageDoc: function() {
@@ -171,9 +176,15 @@ Template.message.events({
 });
 
 AutoForm.addHooks('messageform', {
+	onSubmit: function (insertDoc, updateDoc, currentDoc) {
+			Message.insert(insertDoc);
+			addIconLayer(insertDoc.coordinates, iconStyle);
+			this.done();
+			return false;
+		},
 	postsForm: {
-		docToForm: function(doc) {
-			if(_.isArray(doc.coordinates)) {
+		docToForm: function (doc) {
+			if (_.isArray(doc.coordinates)) {
 				doc.coordinates = doc.coordinates.join(", ");
 			}
 			return doc;
