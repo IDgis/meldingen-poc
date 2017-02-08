@@ -9,6 +9,10 @@ Router.configure({
 });
 
 Router.route('/', function () {
+	Router.go('message');
+});
+
+Router.route('/meldingen', function () {
 	this.render('message');
 	}, {
 		name: 'message'
