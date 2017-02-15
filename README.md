@@ -11,7 +11,7 @@
   * you have set `ANDROID_HOME`;
   * you have a Java KeyStore (and a password) to sign your app with.
 - Change the host name in `mobile-config.js` to your host name.
-- Build APK by running `meteor build ..\output --server=http://<your-host>:3000/offline-contacts`. The APK will be generated as `..\output\android\release-unsigned.apk`.
+- Build APK by running `meteor build ..\output --server=http://<your-host>:3000/meldingen`. The APK will be generated as `..\output\android\release-unsigned.apk`.
 - The tool needed for aligning and signed can be found in `%ANDROID_HOME%\build-tools\<your-version>`. Add this location to your PATH;
 - Move to the folder `output\android`.
 - Zipalign the APK by running `zipalign 4 release-unsigned.apk release-unsigned-aligned.apk`.
