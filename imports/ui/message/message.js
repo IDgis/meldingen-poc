@@ -5,7 +5,7 @@ import { Message, MessageSchema } from '/imports/api/collections/message.js';
 
 var map;
 
-var iconStyle = new ol.style.Style({
+const iconStyle = new ol.style.Style({
 		image: new ol.style.Icon(({
 		anchor: [0.5, 32],
 		anchorXUnits: 'fraction',
@@ -15,8 +15,8 @@ var iconStyle = new ol.style.Style({
 		size: [32, 32]
 	}))
 });
- 
-Template.message.onRendered(function() {
+
+Template.message.onRendered(function () {
 	var projection = new ol.proj.Projection({
 		code: 'EPSG:28992',
 		extent: [170000, 300000, 213000, 412000]
@@ -123,14 +123,32 @@ Template.message.onRendered(function() {
 		$('#afdelingen-info-modal').modal();
 	});
 	
-	var messages = Message.find().fetch();
-	for(var i = 0; i < messages.length; i++) {
-		var coordinates = messages[i].coordinates;
-		addIconLayer(coordinates, iconStyle);
-	}
+	// The subscription of messages and addition of icon layers is called here because the map object must be initialized first
+	var self = this;
+	self.autorun(function () {
+		if (Meteor.status().connected) {
+			Meteor.subscribe('message');
+		};
+	});
+
+	Message.find().observeChanges({
+		added: function (id, fields) {
+			// console.log("doc changed with id " + id + " and coordinates (" + fields.coordinates[0] + ", " + fields.coordinates[1] + ")");
+			addIconLayer(id, fields.coordinates, iconStyle);
+		},
+		changed: function (id, fields) {
+			// console.log("doc changed with id " + id + " and coordinates (" + fields.coordinates[0] + ", " + fields.coordinates[1] + ")");
+			removeIconLayer(id);
+			addIconLayer(id, fields.coordinates, iconStyle);
+		},
+		removed: function (id) {
+			// console.log("doc removed with id " + id);
+			removeIconLayer(id);
+		}
+	});
 });
 
-function addIconLayer(coordinates, iconStyle) {
+function addIconLayer(id, coordinates, iconStyle) {
 	var coordinateX = parseInt(coordinates[0], 10);
 	var coordinateY = parseInt(coordinates[1], 10);
 
@@ -139,6 +157,7 @@ function addIconLayer(coordinates, iconStyle) {
 		});
 
 	var vectorLayer = new ol.layer.Vector({
+			id: id,
 			source: new ol.source.Vector({
 				features: [iconFeature]
 			})
@@ -147,6 +166,17 @@ function addIconLayer(coordinates, iconStyle) {
 	iconFeature.setStyle(iconStyle);
 	map.addLayer(vectorLayer);
 };
+
+function removeIconLayer(id) {
+	var vectorLayers = map.getLayersByClass("OpenLayers.Layer.Vector");
+	
+	for(var i = 0; i < vectorLayers.length; i++) {
+		var vectorLayer = vectorLayers[i];
+		if (vectorLayer.id === id) {
+			map.removeLayer(vectorLayer);
+		}
+	}
+}
 
 Template.message.helpers({
 	messageDoc: function() {
@@ -178,7 +208,6 @@ Template.message.events({
 AutoForm.addHooks('messageform', {
 	onSubmit: function (insertDoc, updateDoc, currentDoc) {
 			Message.insert(insertDoc);
-			addIconLayer(insertDoc.coordinates, iconStyle);
 			this.done();
 			return false;
 		},
