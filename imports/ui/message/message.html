@@ -10,7 +10,7 @@
 					</button>
 					<h4 class="modal-title">Voer punt in</h4>
 				</div>
-				{{#autoForm collection=message schema=messageSchema type="insert" id="messageform" doc=messageDoc}}
+				{{#autoForm collection=message schema=messageSchema id="messageform" doc=messageDoc}}
 					<div class="modal-body">
 						<fieldset>
 							{{> afQuickField name="coordinates" type="hidden" id="js-form-message-coordinates"}}
