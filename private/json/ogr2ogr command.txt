@@ -1,0 +1,1 @@
+ogr2ogr -s_srs "EPSG:28992" -t_srs "EPSG:4326" -f "GeoJSON" "afdelingen.geojson" "MSSQL:server=IJSSEL\SQLEXPRESS;database=OVERWATER;tables=dbo.afdelingen;trusted_connection=yes;"
