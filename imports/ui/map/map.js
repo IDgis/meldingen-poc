@@ -54,7 +54,7 @@ Template.mapTemplate.onRendered(function () {
 	
 	Message.find().observeChanges({
 		added: function (id, fields) {
-			addMarker(markers, fields.coordinates, fields.description);
+			addMarker(markers, fields.coordinates, fields.description, map);
 		},
 		removed: function (id) {
 			removeMarker('someID');
@@ -92,11 +92,11 @@ function updateLayer(geoJsonLayer, features) {
 	});
 }
 
-function addMarker(markers, coordinates, info) {
+function addMarker(markers, coordinates, info, map) {
 	var marker = new L.marker(coordinates[0], coordinates[1]);
 	marker.bindPopup(info);
 	markers.push(marker);
-	map.addLayer(marker);
+	marker.addTo(map);
 }
 
 function removeMarker(id) {
