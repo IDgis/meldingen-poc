@@ -2,8 +2,21 @@ import './message.html';
 import './message.css';
 
 import { Message, MessageSchema } from '/imports/api/collections/message.js';
- 
-Template.message.onRendered(function() {
+
+var map;
+
+const iconStyle = new ol.style.Style({
+		image: new ol.style.Icon(({
+		anchor: [0.5, 32],
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'pixels',
+		opacity: 0.75,
+		src: 'images/location.svg',
+		size: [32, 32]
+	}))
+});
+
+Template.message.onRendered(function () {
 	var projection = new ol.proj.Projection({
 		code: 'EPSG:28992',
 		extent: [170000, 300000, 213000, 412000]
@@ -64,7 +77,7 @@ Template.message.onRendered(function() {
 		})
 	});
 
-	var map = new ol.Map({
+	map = new ol.Map({
 		layers: [achtergrond, afdelingen],
 		control: zoomControl,
 		interactions: ol.interaction.defaults({doubleClickZoom :false}),
@@ -110,38 +123,63 @@ Template.message.onRendered(function() {
 		$('#afdelingen-info-modal').modal();
 	});
 	
-	var iconStyle = new ol.style.Style({
-		image: new ol.style.Icon(({
-			anchor: [0.5, 32],
-			anchorXUnits: 'fraction',
-			anchorYUnits: 'pixels',
-			opacity: 0.75,
-			src: 'images/location.svg',
-			size: [32, 32]
-		}))
+	// The subscription of messages and addition of icon layers is called here because the map object must be initialized first
+	var self = this;
+	self.autorun(function () {
+		if (Meteor.status().connected) {
+			Meteor.subscribe('message');
+		};
 	});
-	
-	var messages = Message.find().fetch();
-	for(var i = 0; i < messages.length; i++) {
-		var coordinates = messages[i].coordinates;
-		
-		var coordinateX = parseInt(coordinates[0], 10);
-		var coordinateY = parseInt(coordinates[1], 10);
-		
-		var iconFeature = new ol.Feature({
+
+	Message.find().observeChanges({
+		added: function (id, fields) {
+			// console.log("doc changed with id " + id + " and coordinates (" + fields.coordinates[0] + ", " + fields.coordinates[1] + ")");
+			addIconLayer(id, fields.coordinates, iconStyle);
+		},
+		changed: function (id, fields) {
+			// console.log("doc changed with id " + id + " and coordinates (" + fields.coordinates[0] + ", " + fields.coordinates[1] + ")");
+			removeIconLayer(id);
+			addIconLayer(id, fields.coordinates, iconStyle);
+		},
+		removed: function (id) {
+			// console.log("doc removed with id " + id);
+			removeIconLayer(id);
+		}
+	});
+});
+
+function addIconLayer(id, coordinates, iconStyle) {
+	var coordinateX = parseInt(coordinates[0], 10);
+	var coordinateY = parseInt(coordinates[1], 10);
+
+	var iconFeature = new ol.Feature({
 			geometry: new ol.geom.Point(coordinates)
 		});
-		
-		var vectorLayer = new ol.layer.Vector({
+
+	var vectorLayer = new ol.layer.Vector({
+			id: id,
 			source: new ol.source.Vector({
 				features: [iconFeature]
 			})
 		});
-		
-		iconFeature.setStyle(iconStyle);
-		map.addLayer(vectorLayer);
+
+	iconFeature.setStyle(iconStyle);
+	map.addLayer(vectorLayer);
+};
+
+function removeIconLayer(id) {
+	console.log("remove " + id);
+	var mapLayers = map.getLayers();
+	
+	console.log(mapLayers.length + " layers");
+	
+	for(var i = 0; i < mapLayers.length; i++) {
+		var mapLayer = mapLayers[i];
+		if (mapLayer.id === id) {
+			map.removeLayer(mapLayer);
+		}
 	}
-});
+}
 
 Template.message.helpers({
 	messageDoc: function() {
@@ -171,9 +209,14 @@ Template.message.events({
 });
 
 AutoForm.addHooks('messageform', {
+	onSubmit: function (insertDoc, updateDoc, currentDoc) {
+			Message.insert(insertDoc);
+			this.done();
+			return false;
+		},
 	postsForm: {
-		docToForm: function(doc) {
-			if(_.isArray(doc.coordinates)) {
+		docToForm: function (doc) {
+			if (_.isArray(doc.coordinates)) {
 				doc.coordinates = doc.coordinates.join(", ");
 			}
 			return doc;

@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Message } from '/imports/api/collections/message.js';
 
 Meteor.startup(function() {
