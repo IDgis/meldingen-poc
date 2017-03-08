@@ -168,12 +168,15 @@ function addIconLayer(id, coordinates, iconStyle) {
 };
 
 function removeIconLayer(id) {
-	var vectorLayers = map.getLayersByClass("OpenLayers.Layer.Vector");
+	console.log("remove " + id);
+	var mapLayers = map.getLayers();
 	
-	for(var i = 0; i < vectorLayers.length; i++) {
-		var vectorLayer = vectorLayers[i];
-		if (vectorLayer.id === id) {
-			map.removeLayer(vectorLayer);
+	console.log(mapLayers.length + " layers");
+	
+	for(var i = 0; i < mapLayers.length; i++) {
+		var mapLayer = mapLayers[i];
+		if (mapLayer.id === id) {
+			map.removeLayer(mapLayer);
 		}
 	}
 }
