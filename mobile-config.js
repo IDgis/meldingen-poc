@@ -24,6 +24,6 @@ App.setPreference('BackgroundColor', '0xff0000ff');
 // Universal Links is shown as an example here.
 App.appendToConfig(`
   <universal-links>
-    <host name="http://lolee:3000" />
+    <host name="http://meldingen.geoide.nl" />
   </universal-links>
 `);
