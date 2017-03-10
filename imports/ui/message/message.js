@@ -30,9 +30,23 @@ Template.message.onRendered(function () {
 
 	var zoomControl = new ol.control.Zoom();
 	
+	var resolutions = [3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36, 1.68, 0.84, 0.42, 0.21];
+	
+	var matrixIds0 = $.map(resolutions, function(resolution) {
+		var indexResolution = resolutions.indexOf(resolution);
+		return 'EPSG:3857' + ':' + indexResolution;
+	});
+	
+	var tileGrid0 = new ol.tilegrid.WMTS({
+		origin: [-20026376.39, -20048966.10],
+		resolutions: resolutions,
+		matrixIds: matrixIds0
+	});
+	
 	var achtergrond = new ol.layer.Tile({
 	    source: new ol.source.OSM({
-	    	url: 'maps/{z}/{x}/{y}.png'
+	    	url: 'maps/{z}/{x}/{y}.png',
+	    	tileGrid: tileGrid0
 	    })
 	});
 	
