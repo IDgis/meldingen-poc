@@ -20,6 +20,7 @@ Template.mapTemplate.onRendered(function () {
 				};
 			},
 			onEachFeature: function (feature, layer) {
+				console.log('binding ' + feature.properties.afdeling);
 				layer.bindPopup(feature.properties.afdeling);
 			}
 		});
@@ -90,7 +91,7 @@ function updateLayer(geoJsonLayer, features) {
 }
 
 function addMarker(markers, id, coordinates, info, map) {
-	console.log('adding marker at [' + coordinates[0] + ', ' + coordinates[1] + ']');
+	console.log('adding marker ' + id + ' at [' + coordinates[0] + ', ' + coordinates[1] + ']');
 	
 	var defaultIcon = L.icon({
 		iconUrl: 'images/location.svg',
@@ -103,10 +104,12 @@ function addMarker(markers, id, coordinates, info, map) {
 	marker._id = id;
 	marker.bindPopup(info);
 	markers.push(marker);
-	map.addLayer(marker);
+	marker.addTo(map);
 }
 
 function removeMarker(markers, id) {
+	console.log('removing marker ' + id);
+	
 	const arrayLength = markers.length;
 	for (var i = 0; i < arrayLength; i++) {
 		const marker = markers[i];
@@ -116,7 +119,6 @@ function removeMarker(markers, id) {
 			break;
 		}
 	}
-	console.log('removing marker is not implemented');
 }
 
 function onMapClick(e) {
