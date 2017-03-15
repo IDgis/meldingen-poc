@@ -64,10 +64,10 @@ Template.mapTemplate.onRendered(function () {
 				
 				Message.find().observeChanges({
 					added: function (id, fields) {
-						addMarker(markers, fields.coordinates, fields.description, map);
+						addMarker(markers, id, fields.coordinates, fields.description, map);
 					},
 					removed: function (id) {
-						removeMarker('someID');
+						removeMarker(markers, id);
 					}
 				});
 			});
@@ -89,35 +89,33 @@ function updateLayer(geoJsonLayer, features) {
 	});
 }
 
-function addMarker(markers, coordinates, info, map) {
+function addMarker(markers, id, coordinates, info, map) {
 	console.log('adding marker at [' + coordinates[0] + ', ' + coordinates[1] + ']');
 	
 	var defaultIcon = L.icon({
 		iconUrl: 'images/location.svg',
 		iconSize:     [32, 32], // size of the icon
 		iconAnchor:   [16, 32], // point of the icon which will correspond to marker's location
-		popupAnchor:  [0, -4] // point from which the popup should open relative to the iconAnchor
+		popupAnchor:  [0, -36] // point from which the popup should open relative to the iconAnchor
 	});
 	
-	// const iconStyle = new ol.style.Style({
-		// image: new ol.style.Icon(({
-			// anchor: [0.5, 32],
-			// anchorXUnits: 'fraction',
-			// anchorYUnits: 'pixels',
-			// opacity: 0.75,
-			// src: 'images/location.svg',
-			// size: [32, 32]
-		// }));
-	// });
-	
 	var marker = new L.marker([coordinates[0], coordinates[1]], {icon: defaultIcon});
+	marker._id = id;
 	marker.bindPopup(info);
 	markers.push(marker);
-	marker.addTo(map);
+	map.addLayer(marker);
 }
 
-function removeMarker(id) {
-	// TODO
+function removeMarker(markers, id) {
+	const arrayLength = markers.length;
+	for (var i = 0; i < arrayLength; i++) {
+		const marker = markers[i];
+		if (marker._id === id) {
+			marker.remove();
+			markers.splice(i);
+			break;
+		}
+	}
 	console.log('removing marker is not implemented');
 }
 
