@@ -21,7 +21,7 @@
 ### Installing
 - First, make sure that
   * you have enabled debugging on your Android device;
-  * you have installed your device's ADB driver;
+  * you have installed your device's ADB driver (eg for galaxy: http://developer.samsung.com/galaxy/others/android-usb-driver-for-windows);
   * your device is USB connected.
 - To install the APK, run `adb install release-signed-aligned.apk`.
 - Check if the app has been installed on your device.
